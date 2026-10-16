@@ -1,4 +1,6 @@
 import logo from "../assets/logo.png";
+import {Link} from "react-router-dom";
+
 
 export default function Navbar() {
   return (
@@ -7,7 +9,7 @@ export default function Navbar() {
         <div>
           <ul className="flex items-center gap-8">
             <li>
-              <a href="" className="flex w-46 items-center gap-2">
+              <Link to="" className="flex w-46 items-center gap-2">
                 <img
                   src={logo}
                   alt=""
@@ -16,44 +18,44 @@ export default function Navbar() {
                 <span className="text-2xl font-semibold leading-8 text-[#164b38]">
                   PropView
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href=""
+              <Link
+                to=""
                 className="text-[#164b38]"
               >
                 Buy
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href=""
+              <Link
+                to=""
               >
                 Rent
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href=""
+              <Link
+                to=""
               >
                 Explore Areas
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
         <div>
           <ul className="flex items-center gap-8 text-sm font-semibold leading-5">
             <li>
-              <a
-                href=""
+              <Link
+                to=""
                 className="flex h-12 w-39 items-center justify-center rounded-xl border border-[#d9e0d8] bg-white text-[#164b38]"
               >
                 List Property
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="" className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">Sign in </a>
+              <Link to="" className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">Sign in </Link>
             </li>
           </ul>
         </div>

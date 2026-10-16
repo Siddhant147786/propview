@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 
 export default function ManualSearch() {
   const [city, setCity] = useState("");
@@ -19,12 +19,23 @@ export default function ManualSearch() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
 
-    const city = formData.get("city");
-    const budget = formData.get("budget");
-    const propertyType = formData.get("propertyType");
-    
+    const query = new URLSearchParams({
+      city: city,
+      budget: budget,
+      propertyType: propertyType,
+    });
+
+    fetch(`/searchhomes?${query.toString()}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        const allhomes = data;
+      })
+      .catch((err) => {
+        console.log(`there is a ${err}`);
+      });
   }
 
   return (
@@ -36,6 +47,7 @@ export default function ManualSearch() {
         <div>
           <button
             type="button"
+            id="Buy"
             onClick={() => setPurpose("Buy")}
             className={`h-11 w-21 rounded-xl text-sm font-semibold leading-5 cursor-pointer ${
               purpose === "Buy" ? "bg-[#164b38] text-white" : "text-[#59695f]"
@@ -46,6 +58,7 @@ export default function ManualSearch() {
 
           <button
             type="button"
+            id="Rent"
             onClick={() => setPurpose("Rent")}
             aria-pressed={purpose === "Rent"}
             className={`h-11 w-21 rounded-xl text-sm font-semibold leading-5 cursor-pointer ${
@@ -68,6 +81,7 @@ export default function ManualSearch() {
               type="text"
               name="city"
               id="city"
+              required
               value={city}
               placeholder="Enter city or locality"
               className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
@@ -85,6 +99,7 @@ export default function ManualSearch() {
             <select
               name="budget"
               id="budget"
+              required
               value={budget}
               className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
               onChange={handleBudget}
@@ -106,6 +121,7 @@ export default function ManualSearch() {
               name="propertyType"
               id="propertyType"
               value={propertyType}
+              required
               className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
               onChange={handlePropertyType}
             >

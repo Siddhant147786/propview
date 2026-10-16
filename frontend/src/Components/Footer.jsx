@@ -1,3 +1,5 @@
+import {Link} from "react-router-dom";
+
 export default function Footer() {
   return (
     <>
@@ -15,16 +17,16 @@ export default function Footer() {
         <nav className="pt-0.75">
           <ul className="flex items-center gap-6 text-sm leading-5 text-[#59695f]">
             <li>
-              <a href="">About</a>
+              <Link to="/about">About</Link>
             </li>
             <li>
-              <a href="">Help</a>
+              <Link to="/help">Help</Link>
             </li>
             <li>
-              <a href="">Privacy</a>
+              <Link to="/privacy">Privacy</Link>
             </li>
             <li>
-              <a href="">Terms</a>
+              <Link to="/terms">Terms</Link>
             </li>
           </ul>
         </nav>
