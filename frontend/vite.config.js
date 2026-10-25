@@ -8,6 +8,7 @@ export default defineConfig({
   server:{
     proxy : {
         "/searchhomes": "http://localhost:3000",
+         "/generateotp": "http://localhost:3000",
     },
   }
 })

@@ -55,7 +55,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="" className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">Sign in </Link>
+              <Link to="/signin" className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">Sign in </Link>
             </li>
           </ul>
         </div>

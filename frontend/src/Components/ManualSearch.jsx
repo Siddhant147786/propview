@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function ManualSearch() {
+  const navigate = useNavigate();
   const [city, setCity] = useState("");
   const [budget, setBudget] = useState(0);
   const [propertyType, setPropertyType] = useState("Flat");
@@ -26,16 +30,8 @@ export default function ManualSearch() {
       propertyType: propertyType,
     });
 
-    fetch(`/searchhomes?${query.toString()}`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        const allhomes = data;
-      })
-      .catch((err) => {
-        console.log(`there is a ${err}`);
-      });
+    navigate("/searchhomes?query.toString()");
+   
   }
 
   return (

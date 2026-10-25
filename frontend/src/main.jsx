@@ -7,7 +7,9 @@ import About from './Components/About.jsx';
 import Contact from './Components/Contact.jsx';
 import Terms from './Components/Terms.jsx';
 import Privacy from './Components/Privacy.jsx';
-
+import SearchHomes from './Components/SearchHomes.jsx';
+import SignIn from './Components/SignIn.jsx';
+import Register from './Components/Register.jsx';
 
 createRoot(document.getElementById('root')).render(
   
@@ -19,6 +21,9 @@ createRoot(document.getElementById('root')).render(
       <Route path="/privacy" element={<Privacy/>}/>
       <Route path="/terms" element={<Terms/>}/>
       <Route path="/contact" element={<Contact/>}/>
+      <Route path="/searchhomes" element={<SearchHomes/>}/>
+      <Route path="/signin" element={<SignIn/>}/>
+      <Route path="/register" element={<Register/>}/>
     
     </Routes>
   </BrowserRouter>
