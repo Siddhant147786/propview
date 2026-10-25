@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-
-
 export default function Register() {
   const navigate = useNavigate();
   const no_of_digits = 6;
@@ -15,35 +13,43 @@ export default function Register() {
   const [otpSent, SetOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
 
-  async function  handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-      const response = await fetch("/register", {
+    const response = await fetch("/api/register", {
       method: "POST", // HTTP method
       headers: {
         "Content-Type": "application/json", // specify JSON format
       },
       body: JSON.stringify({
         email: email,
-        name : name,
-        phone : phone,
-        password : password,
+        name: name,
+        phone: phone,
+        password: password,
       }), // convert JS object to JSON string
     });
 
-    if(response.ok){
-      navigate("/signin")
-    }else{
+    const data = await response.json();
 
+    if (response.ok) {
+      navigate("/signin");
+    } else {
+      alert(data.message);
     }
-
   }
 
   async function handleClickVerify(event) {
     event.preventDefault();
 
-    const result = await fetch("/verifyotp", {
+    const result = await fetch("/api/verifyotp", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json", // specify JSON format
+      },
+      body: JSON.stringify({
+        email: email,
+        otp: inputotp.join(""),
+      }),
     });
   }
 
@@ -53,16 +59,13 @@ export default function Register() {
       return;
     }
 
-    const response = await fetch("/generateotp", {
+    const response = await fetch("/api/generateotp", {
       method: "POST", // HTTP method
       headers: {
         "Content-Type": "application/json", // specify JSON format
       },
       body: JSON.stringify({
         email: email,
-        name : name,
-        phone : phone,
-        password : password,
       }), // convert JS object to JSON string
     });
 
@@ -71,7 +74,9 @@ export default function Register() {
     if (response.ok) {
       alert("otp sent successfully: ");
       SetOtpSent(true);
+      setOtpVerified(false);
     } else {
+      setOtpVerified(false);
       alert(data.message);
     }
 
@@ -123,6 +128,9 @@ export default function Register() {
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value);
+                SetOtpSent(false);
+                setOtpVerified(false);
+                setInputOtp(new Array(no_of_digits).fill(""));
               }}
             />
 
@@ -222,7 +230,7 @@ export default function Register() {
             )}
 
             {otpVerified && (
-              <button type="submit" onClick={handleSubmit}>
+              <button type="submit">
                 Regitser
               </button>
             )}

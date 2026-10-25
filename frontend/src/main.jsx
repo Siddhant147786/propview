@@ -10,6 +10,8 @@ import Privacy from './Components/Privacy.jsx';
 import SearchHomes from './Components/SearchHomes.jsx';
 import SignIn from './Components/SignIn.jsx';
 import Register from './Components/Register.jsx';
+import ListProperty from './Components/listproperty.jsx';
+
 
 createRoot(document.getElementById('root')).render(
   
@@ -24,6 +26,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/searchhomes" element={<SearchHomes/>}/>
       <Route path="/signin" element={<SignIn/>}/>
       <Route path="/register" element={<Register/>}/>
+      <Route path="/listproperty" element={<ListProperty/>}/>
     
     </Routes>
   </BrowserRouter>

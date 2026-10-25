@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   async function handleSubmit(event) {
     event.preventDefault();
-    const response = await fetch("/signin", {
+    const response = await fetch("/api/signin", {
       method: "POST", // HTTP method
       headers: {
         "Content-Type": "application/json", // specify JSON format
@@ -18,10 +18,12 @@ export default function SignIn() {
       }), // convert JS object to JSON string
     });
     
+    const data = await response.json();
+
     if(response.ok){
       navigate("/");
     }else{
-
+      alert(data.message);
     }
   }
 

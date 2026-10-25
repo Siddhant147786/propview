@@ -61,25 +61,47 @@ const propertySchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    propertyAge : {
-
-    },
-    facing : {
-
-    },
+    propertyAge: {},
+    facing: {},
     address: {
       googlePlaceId: {
         type: String,
+        trim: true,
       },
-      countryCode: {},
-      state: {},
-      city: {},
-      locality: {},
-      pincode: {},
-      buildingName: {},
-      addressLine: {},
-      unitNumber: {},
-      landmark: {},
+      countryCode: {
+        type: String,
+        trim: true,
+      },
+      state: {
+        type: String,
+        trim: true,
+      },
+      city: {
+        type: String,
+        trim: true,
+      },
+      locality: {
+        type: String,
+        trim: true,
+      },
+      pincode: {
+        type: String,
+        trim: true,
+      },
+      buildingName: {
+        type: String,
+        trim: true,
+      },
+      addressLine: {
+        type: String,
+        trim: true,
+      },
+      unitNumber: {
+        type: String,
+      },
+      landmark: {
+        type: String,
+      },
     },
     furnishings: {
       type: Array,

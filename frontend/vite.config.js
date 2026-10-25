@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server:{
     proxy : {
-        "/searchhomes": "http://localhost:3000",
-         "/generateotp": "http://localhost:3000",
+        "/api": "http://localhost:3000"
+
     },
   }
 })

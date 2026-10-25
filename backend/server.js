@@ -10,6 +10,8 @@ const saltRounds = 10;
 const nodemailer = require("nodemailer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+
 
 require("dotenv").config({
   path: path.join(__dirname, ".env"),
@@ -25,6 +27,7 @@ const transporter = nodemailer.createTransport({
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/propview")
@@ -39,7 +42,7 @@ app.listen(3000, () => {
   console.log("server started: ");
 });
 
-app.post("/generateotp", async (req, res, next) => {
+app.post("/api/generateotp", async (req, res, next) => {
   const { email } = req.body;
 
   if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -159,7 +162,7 @@ app.post("/generateotp", async (req, res, next) => {
   // send response
 });
 
-app.post("/verifyotp", async (req, res, next) => {
+app.post("/api/verifyotp", async (req, res, next) => {
   const { otp, email } = req.body;
 
   const result = await Otp.findOne({
@@ -187,11 +190,7 @@ app.post("/verifyotp", async (req, res, next) => {
   }
 });
 
-app.post("/register", async (req, res, next) => {
-  // server side validation
-
-  //
-
+app.post("/api/register", async (req, res, next) => {
   const { email, name, phone, password } = req.body;
   const hashPassword = await bcrypt.hash(password, 10);
 
@@ -223,7 +222,7 @@ app.post("/register", async (req, res, next) => {
   }
 });
 
-app.post("/signin", async (req, res) => {
+app.post("/api/signin", async (req, res) => {
   const { email, password } = req.body;
 
   if (
@@ -268,6 +267,25 @@ app.post("/signin", async (req, res) => {
     });
   }
 });
+
+app.get("/api/isloggedin", (req,res) => {
+ 
+  const token = req.cookies.token;
+  try{
+    return res.status(200).json(
+      {
+        message: "You are signed in."
+      }
+    );
+  }catch(err){
+    return res.status(401).json(
+      {
+         message: "Please sign in to continue."
+      }
+    );
+  } 
+
+})
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log the error stack

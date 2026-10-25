@@ -48,7 +48,7 @@ export default function Navbar() {
           <ul className="flex items-center gap-8 text-sm font-semibold leading-5">
             <li>
               <Link
-                to=""
+                to="/listproperty"
                 className="flex h-12 w-39 items-center justify-center rounded-xl border border-[#d9e0d8] bg-white text-[#164b38]"
               >
                 List Property
