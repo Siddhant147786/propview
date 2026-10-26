@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
         },
         email : {
             type : String,
+            trim: true,
+            lowercase: true,
             required : true,
             unique : true,
         },
@@ -18,8 +20,9 @@ const userSchema = new mongoose.Schema(
             required : true,
         },
         phone : {
-            type : Number,
+            type : String,
         },
+        tokenVersion: { type: Number, default: 0 },
         status : {
             type : String,
             enum : ["active", "suspended", "deactivate"],

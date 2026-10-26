@@ -8,6 +8,7 @@ const propertySchema = new mongoose.Schema(
       ref: User,
       required: true,
     },
+    deletedAt: { type: Date, default: null },
     title: {
       type: String,
       trim: true,
@@ -139,6 +140,9 @@ const propertySchema = new mongoose.Schema(
   },
 );
 
+propertySchema.index({ deletedAt: 1, createdAt: -1, _id: -1 });
+propertySchema.index({ ownerId: 1, deletedAt: 1, createdAt: -1 });
+propertySchema.index({ deletedAt: 1, listingType: 1, price: 1 });
 const Property = mongoose.model("Property", propertySchema);
 
 module.exports = { Property };

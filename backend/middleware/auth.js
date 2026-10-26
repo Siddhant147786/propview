@@ -11,8 +11,8 @@ async function requireAuth(req, res, next) {
     return res.status(401).json({ message: "Please sign in to continue." });
   }
   try {
-    const user = await User.findById(payload.userId).select("name email phone status createdAt");
-    if (!user || user.status !== "active") {
+    const user = await User.findById(payload.userId).select("name email phone status createdAt tokenVersion");
+    if (!user || user.status !== "active" || (payload.version || 0) !== (user.tokenVersion || 0)) {
       return res.status(401).json({ message: "Please sign in with an active account." });
     }
     req.user = user;

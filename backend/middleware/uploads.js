@@ -42,7 +42,7 @@ function receiveImages(req, res, next) {
       return next(error);
     }
 
-    if (!req.files?.length) {
+    if (!req.files?.length && req.method === "POST") {
       return res.status(400).json({ message: "Please select at least one image." });
     }
 

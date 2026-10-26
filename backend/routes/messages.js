@@ -1,0 +1,10 @@
+const router = require("express").Router();
+const controller = require("../controllers/messageController");
+const { requireAuth } = require("../middleware/auth");
+const { rateLimit } = require("../middleware/rateLimit");
+router.use(requireAuth);
+router.get("/", controller.list);
+router.post("/", rateLimit(15), controller.create);
+router.post("/:id/replies", rateLimit(40), controller.reply);
+router.patch("/:id", rateLimit(100), controller.update);
+module.exports = router;

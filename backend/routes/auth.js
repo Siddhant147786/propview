@@ -1,0 +1,11 @@
+const router = require("express").Router();
+const controller = require("../controllers/authController");
+const { rateLimit } = require("../middleware/rateLimit");
+const limit = rateLimit();
+router.post("/generateotp", limit, controller.generateOtp);
+router.post("/verifyotp", limit, controller.verifyOtp);
+router.post("/register", limit, controller.register);
+router.post("/signin", rateLimit(30), controller.signin);
+router.post("/forgot-password", limit, controller.requestReset);
+router.post("/reset-password", limit, controller.resetPassword);
+module.exports = router;

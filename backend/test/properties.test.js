@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const { v2: cloudinary } = require("cloudinary");
 const { User } = require("../models/User");
 const { Property } = require("../models/Property");
+const { errorHandler } = require("../middleware/errorHandler");
 
 test("property submission, sessions and cleanup", async (t) => {
   process.env.JWT_SECRET = "test-only-not-a-production-secret";
@@ -39,7 +40,7 @@ test("property submission, sessions and cleanup", async (t) => {
   app.use(cookieParser());
   app.use("/api", require("../routes/session"));
   app.use("/api/properties", require("../routes/properties"));
-  app.use((err, req, res, next) => res.status(500).json({ message: "Test server error" }));
+  app.use(errorHandler);
   const server = app.listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   t.after(() => new Promise((resolve) => server.close(resolve)));
