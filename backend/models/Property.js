@@ -61,9 +61,16 @@ const propertySchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    propertyAge: {},
-    facing: {},
+    propertyAge: { type: Number, min: 0 },
+    facing: { type: String, enum: ["", "North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"] },
+    images: [{
+      url: { type: String, required: true },
+      publicId: { type: String, required: true },
+    }],
     address: {
+      formattedAddress: { type: String, trim: true },
+      latitude: { type: Number, min: -90, max: 90 },
+      longitude: { type: Number, min: -180, max: 180 },
       googlePlaceId: {
         type: String,
         trim: true,
@@ -75,10 +82,12 @@ const propertySchema = new mongoose.Schema(
       state: {
         type: String,
         trim: true,
+        required: true,
       },
       city: {
         type: String,
         trim: true,
+        required: true,
       },
       locality: {
         type: String,
@@ -117,9 +126,11 @@ const propertySchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
+      min: 1,
     },
     maintenance: {
       type: Number,
+      min: 0,
     },
   },
 

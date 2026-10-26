@@ -11,6 +11,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const { requireAuth } = require("./middleware/auth");
 
 
 require("dotenv").config({
@@ -28,6 +29,8 @@ const transporter = nodemailer.createTransport({
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/api", require("./routes/session"));
+app.use("/api/properties", require("./routes/properties"));
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/propview")
@@ -237,7 +240,7 @@ app.post("/api/signin", async (req, res) => {
   }
 
   const document = await User.findOne({ email });
-  if (!document) {
+  if (!document || document.status !== "active") {
     return res.status(401).json({
       message: "Invalid email or password.",
     });
@@ -260,6 +263,7 @@ app.post("/api/signin", async (req, res) => {
 
     return res.status(200).json({
       message: "Signed in successfully.",
+      user: { _id: document._id, name: document.name, email: document.email, phone: document.phone },
     });
   } else {
     return res.status(401).json({
@@ -268,24 +272,12 @@ app.post("/api/signin", async (req, res) => {
   }
 });
 
-app.get("/api/isloggedin", (req,res) => {
- 
-  const token = req.cookies.token;
-  try{
-    return res.status(200).json(
-      {
-        message: "You are signed in."
-      }
-    );
-  }catch(err){
-    return res.status(401).json(
-      {
-         message: "Please sign in to continue."
-      }
-    );
-  } 
+app.get("/api/isloggedin", requireAuth, (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ message: "You are signed in." });
+});
 
-})
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log the error stack

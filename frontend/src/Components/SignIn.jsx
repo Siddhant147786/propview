@@ -1,13 +1,23 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { AuthContext } from "../auth/AuthContext";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signedIn } = useContext(AuthContext);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
   async function handleSubmit(event) {
     event.preventDefault();
+    if (pending) return;
+    setPending(true);
+    setError("");
+    try {
     const response = await fetch("/api/signin", {
+      credentials: "include",
       method: "POST", // HTTP method
       headers: {
         "Content-Type": "application/json", // specify JSON format
@@ -21,10 +31,15 @@ export default function SignIn() {
     const data = await response.json();
 
     if(response.ok){
-      navigate("/");
+      signedIn(data.user);
+      const from = location.state?.from;
+      navigate(["/listproperty", "/profile"].includes(from) ? from : "/", { replace: true });
     }else{
-      alert(data.message);
+      setError(data.message || "Sign-in failed.");
     }
+    } catch {
+      setError("Unable to connect. Please try again.");
+    } finally { setPending(false); }
   }
 
   return (
@@ -39,6 +54,7 @@ export default function SignIn() {
           </p>
 
           <form className="mt-8 flex flex-col gap-5" onSubmit={handleSubmit}>
+            {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
             <div className="flex flex-col gap-2">
               <label
                 className="text-sm font-semibold text-[#1b3025]"
@@ -52,7 +68,7 @@ export default function SignIn() {
                 value={email}
                 name="email"
                 id="email"
-                required="true"
+                required
                 onChange={(event) => {
                   setEmail(event.target.value);
                 }}
@@ -72,7 +88,7 @@ export default function SignIn() {
                 id="password"
                 name="password"
                 value={password}
-                required="true"
+                required
                 onChange={(event) => {
                   setPassword(event.target.value);
                 }}
@@ -90,9 +106,9 @@ export default function SignIn() {
               <button
                 className="h-12 w-full rounded-xl bg-[#164b38] text-sm font-semibold text-white transition-colors hover:bg-[#103d2d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#164b38] focus-visible:ring-offset-2"
                 type="submit"
-                onSubmit={handleSubmit}
+                disabled={pending}
               >
-                Sign In
+                {pending ? "Signing in..." : "Sign In"}
               </button>
             </div>
           </form>

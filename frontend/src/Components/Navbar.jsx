@@ -1,15 +1,18 @@
 import logo from "../assets/logo.png";
 import {Link} from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../auth/AuthContext";
 
 
 export default function Navbar() {
+  const { user, loading } = useContext(AuthContext);
   return (
     <>
-      <nav className="flex h-20 items-center justify-between bg-[#faf8f3] px-20 text-sm font-semibold leading-5 text-[#59695f]">
+      <nav className="flex min-h-20 flex-wrap items-center justify-between gap-4 bg-[#faf8f3] px-5 py-4 text-sm font-semibold leading-5 text-[#59695f] lg:px-20">
         <div>
-          <ul className="flex items-center gap-8">
+          <ul className="flex flex-wrap items-center gap-4 sm:gap-8">
             <li>
-              <Link to="" className="flex w-46 items-center gap-2">
+              <Link to="/" className="flex items-center gap-2">
                 <img
                   src={logo}
                   alt=""
@@ -55,7 +58,11 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="/signin" className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">Sign in </Link>
+              {loading ? <span role="status">Loading...</span> : (
+                <Link to={user ? "/profile" : "/signin"} className="flex h-12 w-24 items-center justify-center rounded-xl bg-[#164b38] text-white">
+                  {user ? "Profile" : "Sign in"}
+                </Link>
+              )}
             </li>
           </ul>
         </div>
