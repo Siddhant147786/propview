@@ -1,39 +1,55 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddressAutocomplete from "./AddressAutocomplete";
+import { api } from "../lib/api";
 
 export default function ListProperty() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [loadedId, setLoadedId] = useState(null);
+  const [loadError, setLoadError] = useState("");
+  const [existingImages, setExistingImages] = useState([]);
   const [submitError, setSubmitError] = useState("");
-  const { register, handleSubmit, setValue, formState: { isSubmitting, errors } } = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { isSubmitting, errors } } = useForm({
     defaultValues: {
       furnishings: [],
       amenities: [],
     },
   });
+  useEffect(() => {
+    if (!id) return;
+    const controller = new AbortController();
+    api(`/properties/${id}/edit`, { signal: controller.signal }).then(({ property }) => {
+      const { images, ...fields } = property;
+      reset(fields); setExistingImages(images || []); setLoadedId(id); setLoadError("");
+    }).catch((error) => { if (error.name !== "AbortError") setLoadError(error.message); });
+    return () => controller.abort();
+  }, [id, reset]);
 
   async function onSubmit(data) {
     setSubmitError("");
     const { images, ...propertyData } = data;
     const formData = new FormData();
     formData.append("propertyData", JSON.stringify(propertyData));
-    for (const image of images) formData.append("images", image);
+    for (const image of images || []) formData.append("images", image);
     try {
-      const response = await fetch("/api/properties", {
-        method: "POST", credentials: "include", body: formData,
+      const response = await fetch(id ? `/api/properties/${id}` : "/api/properties", {
+        method: id ? "PATCH" : "POST", credentials: "include", body: formData,
       });
       if (response.status === 401) {
-        navigate("/signin", { state: { from: "/listproperty" } });
+        navigate("/signin", { state: { from: id ? `/properties/${id}/edit` : "/listproperty" } });
         return;
       }
       const result = await response.json();
       if (!response.ok) { setSubmitError(result.message || "Could not publish the property."); return; }
-      navigate("/profile", { replace: true, state: { published: true } });
+      navigate("/profile", { replace: true, state: id ? { updated: true } : { published: true } });
     } catch {
       setSubmitError("Unable to confirm publication. Check your profile before trying again.");
     }
   }
+
+  if (id && loadedId !== id) return <main className="p-8"><p role={loadError ? "alert" : "status"}>{loadError || "Loading your property..."}</p><Link to="/profile" className="underline">Back to profile</Link></main>;
 
   return (
 
@@ -58,7 +74,7 @@ export default function ListProperty() {
             A new home, a new beginning
           </p>
           <h1 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            Tell us about your property.
+            {id ? "Edit your property." : "Tell us about your property."}
           </h1>
           <p className="mt-4 text-base leading-7 text-[#59695f]">
             From the little details to the perfect location, help people picture
@@ -497,7 +513,7 @@ export default function ListProperty() {
                 </p>
               </div>
             </div>
-            <AddressAutocomplete setValue={setValue} />
+            {import.meta.env.VITE_ENABLE_GOOGLE_AUTOCOMPLETE === "true" && import.meta.env.VITE_GOOGLE_MAPS_API_KEY && <AddressAutocomplete setValue={setValue} />}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="min-w-0">
                 <label
@@ -643,8 +659,9 @@ export default function ListProperty() {
               </div>
             </div>
             <label className="mb-2 block text-sm font-semibold" htmlFor="images">
-              Select images
+              {id ? "Replace photos (optional)" : "Select images"}
             </label>
+            {id && <div className="mb-4 flex flex-wrap gap-3">{existingImages.map((image) => <img key={image.publicId} src={image.url} alt="Current property photo" className="h-24 w-32 rounded-xl object-cover" />)}</div>}
             <input
               id="images"
               type="file"
@@ -654,7 +671,7 @@ export default function ListProperty() {
               className="w-full cursor-pointer rounded-xl border border-[#d9e0d8] bg-[#fdfefc] px-4 py-3 text-sm text-[#1b3025] file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#eaf0e6] file:px-4 file:py-2 file:font-semibold file:text-[#164b38] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#164b38]"
               {...register("images", {
                 validate: (files) => {
-                  if (!files?.length) return "Select at least one property photo.";
+                  if (!files?.length) return id ? true : "Select at least one property photo.";
                   if (files.length > 10) return "Select no more than 10 photos.";
                   if (Array.from(files).some((file) => file.size > 5 * 1024 * 1024)) return "Each photo must be 5 MB or smaller.";
                   if (Array.from(files).some((file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type))) return "Choose JPG, PNG or WebP photos.";
@@ -665,6 +682,7 @@ export default function ListProperty() {
             />
             <p id="images-help" className="mt-2 text-sm text-[#59695f]">
               Choose 1–10 JPG, PNG or WebP images, up to 5 MB each.
+              {id && " Leave this empty to keep current photos. Selecting new photos replaces all current photos."}
             </p>
             {errors.images && <p role="alert" className="mt-2 text-sm text-red-700">{errors.images.message}</p>}
           </section>
@@ -680,7 +698,7 @@ export default function ListProperty() {
               type="submit"
               className="shrink-0 cursor-pointer rounded-xl bg-[#164b38] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#103d2d] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#164b38]"
             >
-              {isSubmitting ? "Uploading and publishing..." : "Publish property"}{" "}
+              {isSubmitting ? "Saving property..." : id ? "Save changes" : "Publish property"}{" "}
               <span className="ml-3" aria-hidden="true">
                 →
               </span>

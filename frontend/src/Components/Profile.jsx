@@ -2,12 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/AuthContext";
 import Navbar from "./Navbar";
+import MessageInbox from "./MessageInbox";
+import ProfileEditor from "./ProfileEditor";
+import { api } from "../lib/api";
 
 export default function Profile() {
   const { user, signOut } = useContext(AuthContext);
   const [properties, setProperties] = useState(null);
   const [error, setError] = useState("");
   const [leaving, setLeaving] = useState(false);
+  const [deleting, setDeleting] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,11 +36,19 @@ export default function Profile() {
     try { await signOut(); navigate("/", { replace: true }); }
     catch { setError("Could not sign out. Please try again."); setLeaving(false); }
   }
+  async function remove(property) {
+    if (!window.confirm(`Remove "${property.title}" from listings? Its photos will also be removed.`)) return;
+    setDeleting(property._id); setError("");
+    try {
+      await api(`/properties/${property._id}`, { method: "DELETE" });
+      setProperties((previous) => previous.filter((item) => item._id !== property._id));
+    } catch (err) { setError(err.message); } finally { setDeleting(""); }
+  }
 
   return <div className="min-h-screen bg-[#faf8f3] text-[#1b3025]">
     <Navbar />
     <main className="mx-auto max-w-5xl px-5 py-10">
-      {location.state?.published && <p role="status" className="mb-6 rounded-xl bg-[#eaf0e6] p-4">Your property has been published.</p>}
+      {(location.state?.published || location.state?.updated) && <p role="status" className="mb-6 rounded-xl bg-[#eaf0e6] p-4">{location.state.updated ? "Your property has been updated." : "Your property has been published."}</p>}
       <section className="rounded-2xl border border-[#d9e0d8] bg-white p-6">
         <h1 className="text-3xl font-semibold">Your profile</h1>
         <dl className="my-6 grid gap-4 sm:grid-cols-3">
@@ -44,6 +56,7 @@ export default function Profile() {
           <div><dt className="text-sm text-[#59695f]">Email</dt><dd className="break-all">{user.email}</dd></div>
           <div><dt className="text-sm text-[#59695f]">Phone</dt><dd>{user.phone || "Not provided"}</dd></div>
         </dl>
+        <ProfileEditor />
         <button type="button" disabled={leaving} onClick={logout} className="rounded-xl border border-[#164b38] px-5 py-2 disabled:opacity-50">{leaving ? "Signing out..." : "Sign out"}</button>
       </section>
       {error && <p role="alert" className="my-4 text-red-700">{error}</p>}
@@ -53,9 +66,10 @@ export default function Profile() {
       <div className="grid gap-6 sm:grid-cols-2">
         {properties?.map((property) => <article key={property._id} className="overflow-hidden rounded-2xl border border-[#d9e0d8] bg-white">
           {property.images?.[0] && <img src={property.images[0].url} alt={property.title} className="h-52 w-full object-cover" loading="lazy" />}
-          <div className="p-5"><h3 className="text-lg font-semibold">{property.title}</h3><p className="mt-2 text-sm">{[property.address?.locality, property.address?.city].filter(Boolean).join(", ")}</p><p className="mt-3 font-semibold">₹{Number(property.price).toLocaleString("en-IN")}{property.listingType === "Rent" ? " / month" : ""}</p></div>
+          <div className="p-5"><h3 className="text-lg font-semibold"><Link to={`/properties/${property._id}`} className="hover:underline">{property.title}</Link></h3><p className="mt-2 text-sm">{[property.address?.locality, property.address?.city].filter(Boolean).join(", ")}</p><p className="mt-3 font-semibold">₹{Number(property.price).toLocaleString("en-IN")}{property.listingType === "Rent" ? " / month" : ""}</p><div className="mt-4 flex gap-4"><Link to={`/properties/${property._id}/edit`} className="underline">Edit</Link><button disabled={Boolean(deleting)} onClick={() => remove(property)} className="text-red-700 underline disabled:opacity-50">{deleting === property._id ? "Removing..." : "Remove"}</button></div></div>
         </article>)}
       </div>
+      <MessageInbox />
     </main>
   </div>;
 }

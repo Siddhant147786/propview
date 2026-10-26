@@ -1,142 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-
-
-export default function ManualSearch() {
+export default function ManualSearch({ initial = {} }) {
   const navigate = useNavigate();
-  const [city, setCity] = useState("");
-  const [budget, setBudget] = useState(0);
-  const [propertyType, setPropertyType] = useState("Flat");
-  const [purpose, setPurpose] = useState("Buy");
-
-  function handleCity(event) {
-    setCity(event.target.value);
-  }
-
-  function handleBudget(event) {
-    setBudget(event.target.value);
-  }
-  function handlePropertyType(event) {
-    setPropertyType(event.target.value);
-  }
-
-  function handleSubmit(event) {
+  const [city, setCity] = useState(initial.city || "");
+  const [budget, setBudget] = useState(initial.budget || "");
+  const [propertyType, setPropertyType] = useState(initial.propertyType || "");
+  const [purpose, setPurpose] = useState(initial.listingType || "Buy");
+  const [bedrooms, setBedrooms] = useState(initial.bedrooms || "");
+  function submit(event) {
     event.preventDefault();
-
-    const query = new URLSearchParams({
-      city: city,
-      budget: budget,
-      propertyType: propertyType,
-    });
-
-    navigate("/searchhomes?query.toString()");
-   
+    const query = new URLSearchParams({ listingType: purpose });
+    if (city.trim()) query.set("city", city.trim());
+    if (budget) query.set("budget", budget);
+    if (propertyType) query.set("propertyType", propertyType);
+    if (bedrooms !== "") query.set("bedrooms", bedrooms);
+    navigate(`/searchhomes?${query}`);
   }
-
-  return (
-    <>
-      <form
-        className="flex w-full flex-col gap-4 rounded-2xl border border-[#d9e0d8] bg-white p-5"
-        onSubmit={handleSubmit}
-      >
-        <div>
-          <button
-            type="button"
-            id="Buy"
-            onClick={() => setPurpose("Buy")}
-            className={`h-11 w-21 rounded-xl text-sm font-semibold leading-5 cursor-pointer ${
-              purpose === "Buy" ? "bg-[#164b38] text-white" : "text-[#59695f]"
-            }`}
-          >
-            Buy
-          </button>
-
-          <button
-            type="button"
-            id="Rent"
-            onClick={() => setPurpose("Rent")}
-            aria-pressed={purpose === "Rent"}
-            className={`h-11 w-21 rounded-xl text-sm font-semibold leading-5 cursor-pointer ${
-              purpose === "Rent" ? "bg-[#164b38] text-white" : "text-[#59695f]"
-            }`}
-          >
-            Rent
-          </button>
-        </div>
-
-        <div className="flex w-full items-end gap-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <label
-              className="text-sm font-semibold leading-5 text-[#1b3025]"
-              htmlFor="city"
-            >
-              City
-            </label>
-            <input
-              type="text"
-              name="city"
-              id="city"
-              required
-              value={city}
-              placeholder="Enter city or locality"
-              className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
-              onChange={handleCity}
-            />
-          </div>
-
-          <div className="flex w-55 shrink-0 flex-col gap-2">
-            <label
-              htmlFor="budget"
-              className="text-sm font-semibold leading-5 text-[#1b3025]"
-            >
-              Budget
-            </label>
-            <select
-              name="budget"
-              id="budget"
-              required
-              value={budget}
-              className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
-              onChange={handleBudget}
-            >
-              <option value=""></option>
-              <option value=""></option>
-              <option value=""></option>
-            </select>
-          </div>
-
-          <div className="flex w-55 shrink-0 flex-col gap-2">
-            <label
-              className="text-sm font-semibold leading-5 text-[#1b3025]"
-              htmlFor="propertyType"
-            >
-              Property Type
-            </label>
-            <select
-              name="propertyType"
-              id="propertyType"
-              value={propertyType}
-              required
-              className="h-12 w-full rounded-xl border border-[#d9e0d8] bg-white px-4 text-base leading-6 text-[#1b3025]"
-              onChange={handlePropertyType}
-            >
-              <option value="Flat">Flat</option>
-              <option value="Apartment">Apartment</option>
-              <option value="Villa">Villa</option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            className="flex h-12 w-54 shrink-0 items-center justify-center self-end rounded-xl bg-[#164b38] px-5 text-sm font-semibold leading-5 text-white cursor-pointer"
-          >
-            Search homes
-          </button>
-        </div>
-        <p className="text-sm leading-5 text-[#59695f]">
-          Popular areas: HSR Layout · Whitefield · Hebbal
-        </p>
-      </form>
-    </>
-  );
+  return <form onSubmit={submit} className="rounded-2xl border border-[#d9e0d8] bg-white p-5">
+    <div className="mb-5 flex gap-2">{["Buy", "Rent"].map((type) => <button key={type} type="button" aria-pressed={purpose === type} onClick={() => { setPurpose(type); setBudget(""); }} className={`rounded-xl px-6 py-3 ${purpose === type ? "bg-[#164b38] text-white" : "bg-[#eaf0e6] text-[#164b38]"}`}>{type}</button>)}</div>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <label className="text-sm font-semibold">City or locality<input value={city} onChange={(e) => setCity(e.target.value)} maxLength={200} placeholder="Any location" className="mt-2 h-12 w-full rounded-xl border p-3" /></label>
+      <label className="text-sm font-semibold">Maximum budget {purpose === "Rent" ? "(monthly)" : ""}<select value={budget} onChange={(e) => setBudget(e.target.value)} className="mt-2 h-12 w-full rounded-xl border p-3"><option value="">Any budget</option>{(purpose === "Rent" ? [10000, 20000, 30000, 50000, 100000] : [2500000, 5000000, 7500000, 10000000, 20000000]).map((amount) => <option key={amount} value={amount}>₹{amount.toLocaleString("en-IN")}</option>)}</select></label>
+      <label className="text-sm font-semibold">Property type<select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className="mt-2 h-12 w-full rounded-xl border p-3"><option value="">Any type</option>{["Flat", "Villa", "Plot", "FarmHouse", "Other"].map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
+      <label className="text-sm font-semibold">Bedrooms<select value={bedrooms} onChange={(event) => setBedrooms(event.target.value)} className="mt-2 h-12 w-full rounded-xl border p-3"><option value="">Any</option>{[0, 1, 2, 3, 4, 5, 6].map((value) => <option key={value} value={value}>{value === 0 ? "Studio / no bedrooms" : value}</option>)}</select></label>
+      <button className="h-12 self-end rounded-xl bg-[#164b38] px-5 text-white">Search homes</button>
+    </div>
+  </form>;
 }

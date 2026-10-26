@@ -1,24 +1,12 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function AiCard() {
-  return (
-    <>
-      <div className="w-106 shrink-0 rounded-[20px] bg-[#eaf0e6] p-6">
-        <h2 className="text-lg font-semibold leading-6.5 text-[#164b38]">
-          Ask PropGuide
-        </h2>
-        <div className="mt-3 text-base leading-6 text-[#59695f]">
-          <p>Not sure where to start?</p>
-          <p>Ask your AI property companion.</p>
-        </div>
-        <textarea
-          name="input"
-          id="input"
-          aria-label="Ask PropGuide a property question"
-          defaultValue="2 BHK flats in Pune"
-          className="mt-3 block h-16 w-full resize-none rounded-xl bg-white p-3 text-sm leading-5 text-[#1b3025]"
-        ></textarea>
-
-        <button type="button"  className="mt-3 flex h-12 w-30 items-center justify-center rounded-xl bg-[#164b38] text-sm font-semibold leading-5 text-white cursor-pointer"> ASK AI</button>
-      </div>
-    </>
-  );
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  return <form onSubmit={(event) => { event.preventDefault(); navigate(`/searchhomes?${new URLSearchParams({ q: query.trim() })}`); }} className="w-full shrink-0 rounded-2xl bg-[#eaf0e6] p-6 lg:w-96">
+    <h2 className="text-lg font-semibold text-[#164b38]">Quick property search</h2>
+    <p className="mt-3 text-sm text-[#59695f]">Search by city, bedrooms and budget. Try “2 BHK flats in Pune under 80 lakh”.</p>
+    <label className="mt-3 block text-sm">What are you looking for?<textarea required maxLength={200} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="2 BHK flats in Pune" className="mt-2 block h-20 w-full rounded-xl bg-white p-3" /></label>
+    <button className="mt-3 rounded-xl bg-[#164b38] px-5 py-3 text-white">Search listings</button>
+  </form>;
 }

@@ -1,7 +1,7 @@
 let loading;
 
-export function loadGooglePlaces() {
-  if (window.google?.maps?.importLibrary) return window.google.maps.importLibrary("places");
+export function loadGoogleLibrary(library) {
+  if (window.google?.maps?.importLibrary) return window.google.maps.importLibrary(library);
   if (!loading) {
     loading = new Promise((resolve, reject) => {
       const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -14,10 +14,14 @@ export function loadGooglePlaces() {
         delete window.propViewGoogleReady;
         reject(new Error("Address search could not load. Please enter your address below."));
       }
+      window.gm_authFailure = () => {
+        fail();
+        window.dispatchEvent(new Event("propview-map-error"));
+      };
       window.propViewGoogleReady = () => {
         window.clearTimeout(timer);
         delete window.propViewGoogleReady;
-        window.google.maps.importLibrary("places").then(resolve, reject);
+        resolve();
       };
       const params = new URLSearchParams({ key, v: "weekly", loading: "async", callback: "propViewGoogleReady" });
       script.src = `https://maps.googleapis.com/maps/api/js?${params}`;
@@ -26,8 +30,9 @@ export function loadGooglePlaces() {
       document.head.appendChild(script);
     }).catch((error) => { loading = undefined; throw error; });
   }
-  return loading;
+  return loading.then(() => window.google.maps.importLibrary(library));
 }
+export function loadGooglePlaces() { return loadGoogleLibrary("places"); }
 
 export function addressFromPlace(place) {
   const parts = place.addressComponents || [];

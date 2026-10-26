@@ -25,7 +25,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                to=""
+                to="/searchhomes?listingType=Buy"
                 className="text-[#164b38]"
               >
                 Buy
@@ -33,14 +33,14 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                to=""
+                to="/searchhomes?listingType=Rent"
               >
                 Rent
               </Link>
             </li>
             <li>
               <Link
-                to=""
+                to="/#areas"
               >
                 Explore Areas
               </Link>
@@ -49,6 +49,7 @@ export default function Navbar() {
         </div>
         <div>
           <ul className="flex items-center gap-8 text-sm font-semibold leading-5">
+            {user?.isAdmin && <li><Link to="/admin" className="underline">Support admin</Link></li>}
             <li>
               <Link
                 to="/listproperty"

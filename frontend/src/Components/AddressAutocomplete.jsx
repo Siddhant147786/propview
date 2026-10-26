@@ -25,6 +25,7 @@ export default function AddressAutocomplete({ setValue }) {
       }
     }
     function unavailable() { if (active) setMessage("Address search is unavailable. Please enter your address below."); }
+    window.addEventListener("propview-map-error", unavailable);
     loadGooglePlaces().then(({ PlaceAutocompleteElement }) => {
       if (!active) return;
       widget = new PlaceAutocompleteElement();
@@ -37,6 +38,7 @@ export default function AddressAutocomplete({ setValue }) {
     }).catch(unavailable);
     return () => {
       active = false;
+      window.removeEventListener("propview-map-error", unavailable);
       widget?.removeEventListener("gmp-select", select);
       widget?.removeEventListener("gmp-error", unavailable);
       widget?.remove();

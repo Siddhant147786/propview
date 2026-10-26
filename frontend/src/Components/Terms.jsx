@@ -35,9 +35,8 @@ export default function Terms() {
 
           <p className="mt-3 text-base leading-7 text-[#59695f]">
             PropView provides property information to help you explore
-            homes and neighbourhoods. Listings and prices marked as
-            examples are illustrative and are not offers for sale or
-            rent. PropView does not accept property bookings, deposits
+            homes and neighbourhoods. Property owners supply the listings and
+            asking prices. PropView does not accept property bookings, deposits
             or payments.
           </p>
         </section>
@@ -103,8 +102,8 @@ export default function Terms() {
           </h2>
 
           <p className="mt-3 text-base leading-7 text-[#59695f]">
-            For questions about these terms, contact
-            hello@propview.example. Updates will appear on this page
+            For questions about these terms, use the Contact page.
+            Updates will appear on this page
             with a revised date. Our Privacy Policy explains how
             information is handled when you use the website or
             contact us.

@@ -5,3 +5,7 @@ backend/uploads/
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
+frontend/dist/
+frontend/playwright-report/
+frontend/test-results/
+*.log

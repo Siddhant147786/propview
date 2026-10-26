@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/AuthContext";
 
 export default function SignIn() {
@@ -33,7 +33,8 @@ export default function SignIn() {
     if(response.ok){
       signedIn(data.user);
       const from = location.state?.from;
-      navigate(["/listproperty", "/profile"].includes(from) ? from : "/", { replace: true });
+      const safePath = typeof from === "string" && /^\/(?:listproperty|profile|contact|admin|properties\/[a-f\d]{24}(?:\/edit)?)$/i.test(from);
+      navigate(safePath ? from : "/", { replace: true });
     }else{
       setError(data.message || "Sign-in failed.");
     }
@@ -54,6 +55,7 @@ export default function SignIn() {
           </p>
 
           <form className="mt-8 flex flex-col gap-5" onSubmit={handleSubmit}>
+            {location.state?.message && <p role="status" className="text-sm text-[#164b38]">{location.state.message}</p>}
             {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
             <div className="flex flex-col gap-2">
               <label
@@ -97,7 +99,7 @@ export default function SignIn() {
             <div className="text-right">
               <Link
                 className="text-sm font-semibold text-[#164b38] hover:underline"
-                to="/reestpassword"
+                to="/resetpassword"
               >
                 Forgot Password
               </Link>
