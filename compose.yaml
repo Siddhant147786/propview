@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        VITE_GOOGLE_MAPS_API_KEY: ${VITE_GOOGLE_MAPS_API_KEY:-}
+        VITE_ENABLE_GOOGLE_AUTOCOMPLETE: ${VITE_ENABLE_GOOGLE_AUTOCOMPLETE:-false}
+        VITE_GOOGLE_MAP_ID: ${VITE_GOOGLE_MAP_ID:-}
+    env_file: backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017/propview
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+  mongo:
+    image: mongo:8
+    volumes:
+      - propview-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  propview-data:
